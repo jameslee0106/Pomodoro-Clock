@@ -2,33 +2,57 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  let time = 1500;
+  
+  const [workTime, setWorkTime] = useState(1500);
+  const [restTime, setRestTime] = useState(500);
+  const [working, setWorking] = useState(true);
+  const [rest, setRest] = useState(false);
+  const [start, setStart] = useState(false);
   let countdownInterval;
 
 
-  function countDown() {
-    countdownInterval = setInterval(() => {
-      if (time > 0) {
-        time--;
+  let countDown = () => {
+    if (working) {
+      countdownInterval = setInterval(() => {
+      if (workTime > 0) {
+        setWorkTime(workTime);
         updateTime();
       } else {
         clearInterval(countdownInterval);
+        setRest(true);
+        setWorking(false);
       }
     }, 1000); 
+    } else if (rest) {
+      countdownInterval = setInterval(() => {
+      if (restTime > 0) {
+        setRestTime(restTime - 1);
+        updateTime();
+      } else {
+        clearInterval(countdownInterval);
+        setRest(false);
+        setWorking(true);
+      }
+    }, 1000); 
+    }
+    
   }
 
-  function updateTime() {
-    document.getElementById("display").innerHTML = time;
+  const updateTime = () => {
+    if (working) {
+      document.getElementById("display").innerHTML = workTime;
+    } else if (rest) {
+      document.getElementById("display").innerHTML = restTime;
+    }
   }
 
-  function resetTime() {
-    time = 1500;
+  const resetTime = () => {
+    setWorkTime(1500);
+    setRestTime(500);
     updateTime();
   }
 
-  function stopTime() {
-    
-  }
+  
     
 
   return (
@@ -40,12 +64,14 @@ function App() {
     </div>
 
     <div className='flex justify-center bg-teal-300 '>
-    <h1 id="display" className="text-4xl font-bold dark:text-white my-10">{time}</h1>
+    <h1 id="display" className="text-4xl font-bold dark:text-white my-10">{workTime}</h1>
     </div>
 
     <div className='flex justify-center my-5'>
-    <button onClick={countDown} className="bg-indigo-600 text-white p-5 rounded-md mx-5">Start Timer</button>
-    <button className="bg-red-500 text-white p-5 rounded-md mx-5 ">Stop Timer</button>
+    <button onClick= {countDown} className="bg-indigo-600 text-white p-5 rounded-md mx-5">Start Timer</button>
+    <button onClick={() => {
+      clearInterval(countdownInterval);
+      }} className="bg-red-500 text-white p-5 rounded-md mx-5 ">Pause Timer</button>
     <button onClick={resetTime} className='bg-purple-500 mx-5 text-white p-5 rounded-md'>Reset</button>
     </div>
     </>
